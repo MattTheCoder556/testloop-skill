@@ -144,10 +144,10 @@ echo
 echo "Scripts"
 if [ -f "$DEST/scripts/reconcile.py" ]; then
 	ALL_OK=1
-	for s in build_results reconcile audit; do
+	for s in build_results reconcile audit preflight; do
 		python3 "$DEST/scripts/$s.py" --help >/dev/null 2>&1 || { todo "$s.py does not run"; ALL_OK=0; }
 	done
-	[ "$ALL_OK" -eq 1 ] && say "build_results / reconcile / audit all runnable"
+	[ "$ALL_OK" -eq 1 ] && say "build_results / reconcile / audit / preflight all runnable"
 else
 	todo "scripts not present at $DEST/scripts"
 fi

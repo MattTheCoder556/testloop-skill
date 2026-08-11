@@ -80,6 +80,32 @@ refuses. Both exit non-zero when they do not pass, so the loop can be driven
 without reading the prose. Without a stated exit condition, "final confirmation"
 means whoever is tired first.
 
+## Preflight — before the first question
+
+```bash
+python3 scripts/preflight.py
+```
+
+testloop drives `/validation` and `/howto`; it does not contain either of them.
+Someone who installed testloop on its own has a working `/testloop` and no
+matrix generator, and `install.sh` only said so once, advisorily, at install
+time. So check here, where it binds.
+
+| Reported | What it means | What to do |
+|---|---|---|
+| `/validation` **not installed** | Document A cannot be produced | **Stop.** Give the user the two `/plugin` lines preflight prints, and start again once it is installed |
+| no `reference/modules.md` | Module names cannot be checked against the registry | Say so, and confirm the module name with the user before stamping it into filenames |
+| `/howto` **not installed** | Document B cannot be produced | Say so and offer the install lines. The user may choose to continue without it — then C, D and E still run, and the iteration simply never tests whether a person can follow the module |
+
+**A missing `/validation` is a stop, not a degradation.** Do not write the
+matrix yourself to keep the cycle moving. `/validation` forbids rows that are
+not grounded in a control you have actually seen, and that rule is what makes
+document A worth executing against; a matrix invented by the model that then
+executes it is precisely the self-certifying loop this skill exists to prevent.
+C, D and E will not catch it — they read `results.json` and any matrix that
+parses, and will render five correctly-named documents and a confident verdict
+on top of a plan nobody validated.
+
 ## 0. Establish the run
 
 Ask two things before anything else, and only these two:
@@ -156,7 +182,7 @@ schema is in `reference/results-spec.md`; the short version:
 ```json
 {
   "matrix": "qmsWrapper_FormBuilder_2026-08-10_1105_v2.xlsx",
-  "environment": "wrapper.uvaresearch.com — DEV tenant, test data",
+  "environment": "wrapper.example.com — DEV tenant, test data",
   "build": "2026-08-10 nightly",
   "tester": "who or what executed the run",
   "results": [
@@ -263,3 +289,6 @@ iteration before it stays on disk as the account of what was known then.
   describe a HOLD as a pass with caveats.
 - **The module name comes from the `/validation` registry**, character for
   character, in every filename and in the prose of all five documents.
+- **Never stand in for a missing skill.** If `/validation` is not installed,
+  stop and say what to install. A hand-written matrix keeps the cycle moving and
+  destroys the only thing it was measuring.

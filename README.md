@@ -28,6 +28,7 @@ was edited after it was generated.
 skills/testloop/
   SKILL.md                      the workflow
   reference/results-spec.md     the results.json schema
+  scripts/preflight.py          are /validation and /howto actually installed?
   scripts/lib.py                matrix loading, house naming, sheet styling
   scripts/build_results.py      C — results spec + matrix → results document
   scripts/reconcile.py          D — coverage, tallies, plan gaps, gate verdict
@@ -50,12 +51,30 @@ anything.
 **`/validation` is a hard dependency**, not a nice-to-have: without it there is
 no module registry and no matrix to execute, so the loop has nothing to start
 from. `/howto` is softer — the rest of the loop runs without it, but then
-nothing tests whether a person can follow the module unaided.
+nothing tests whether a person can follow the module unaided. Neither ships
+inside this repo.
 
 ```
 /plugin marketplace add MattTheCoder556/validation-skill
 /plugin install validation@validation-skill
+
+/plugin marketplace add MattTheCoder556/howto-skill
+/plugin install howto@howto-skill
 ```
+
+`/testloop` checks for both itself before it asks anything —
+`scripts/preflight.py`, run at the top of the cycle — and **stops** with these
+commands if `/validation` is missing rather than writing the matrix freehand.
+That is not politeness about dependencies: a matrix invented by the model that
+then executes it is the self-certifying loop the skill exists to prevent, and
+C, D and E cannot detect it. They read `results.json` and any matrix that
+parses, so an install missing `/validation` would still render five
+correctly-named documents and a confident verdict.
+
+**This drives a live qmsWrapper instance.** Exploration and execution mean
+opening the module in a browser and working the cases against a real tenant with
+real credentials. It is not a general-purpose test harness; without an instance,
+steps 0 to 2 have nothing to act on.
 
 ### As a plugin
 

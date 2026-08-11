@@ -21,7 +21,7 @@ Spec schema (JSON):
 {
   "matrix": "qmsWrapper_FormBuilder_2026-08-10_1105_v2.xlsx",  # or pass --matrix
   "sheet": "Form Builder",              # optional; needed for multi-sheet workbooks
-  "environment": "wrapper.uvaresearch.com — DEV tenant, test data",
+  "environment": "wrapper.example.com — DEV tenant, test data",
   "build": "2026-08-10 nightly",
   "tester": "who or what executed the run",
   "results": [

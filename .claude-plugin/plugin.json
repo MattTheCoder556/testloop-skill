@@ -1,6 +1,6 @@
 {
   "name": "testloop",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Run one qmsWrapper module through a closed test cycle: explore it, draft the Validation Test Matrix with /validation and the user guide with /howto, execute the matrix, record the results, reconcile the record against the plan, then audit the reconciliation against the record and either confirm the iteration or refuse it. Five documents sharing one module, timestamp and version; every count is computed rather than asserted, and an iteration that does not confirm becomes the agenda for the next one.",
   "author": {
     "name": "MattTheCoder556",
