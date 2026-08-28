@@ -341,12 +341,12 @@ the case is re-run at v+1 — it does not flip the case to Fail by decree. A
 `Settled` verdict does not turn a `Not run` into a Pass; the case still has to
 be executed. Source is a witness, not a substitute for running the test.
 
-## 5b. File the iteration into Wrapper Storage — LOCAL / EXPERIMENTAL
+## 5b. File the iteration into Wrapper Storage
 
-**This step is a local addition and is not part of the published skill.** It is
-being trialled; until it has been through a few iterations, treat a failure here
-as a problem with the step, not with the run. The six documents are complete
-and valid whether or not this succeeds — filing is bookkeeping after the fact.
+**Filing is bookkeeping after the fact, and it is optional.** The six documents
+are complete and valid whether or not this succeeds, so treat a failure here as a
+problem with the step rather than with the run. It needs a Wrapper tenant and an
+upload-scoped token; skip it entirely if you have neither.
 
 Run it after `audit.py`, from inside the run directory:
 
