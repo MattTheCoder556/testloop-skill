@@ -4,7 +4,7 @@
 The results document is the *record*: one row per test case in the Validation
 Test Matrix, carrying what actually happened when that case was executed.
 
-Test ID, title, expected result, priority and regulatory flag are copied from
+Test ID, title, expected result, priority, regulatory flag and tier are copied from
 the matrix, never from the spec — a results document that paraphrases the plan
 cannot be reconciled against it. The spec supplies only the outcome: status,
 what was observed, the evidence, and any defect reference.
@@ -57,6 +57,7 @@ HEADERS = [
     ("Test Case Title", "title"),
     ("Priority", "priority"),
     ("Regulatory / Compliance-Critical", "regulatory"),
+    ("Tier", "tier"),
     ("Expected Result", "expected"),
     ("Status", "status"),
     ("Observed Result", "observed"),
@@ -64,7 +65,7 @@ HEADERS = [
     ("Defect", "defect"),
     ("Notes", "notes"),
 ]
-WIDTHS = [11, 22, 34, 9, 14, 44, 11, 46, 26, 12, 26]
+WIDTHS = [11, 22, 34, 9, 14, 13, 44, 11, 46, 26, 12, 26]
 
 
 def merge(matrix, spec, allow_unknown):
@@ -99,6 +100,7 @@ def merge(matrix, spec, allow_unknown):
             "title": row["title"],
             "priority": row["priority"],
             "regulatory": row["regulatory"],
+            "tier": row.get("tier") or lib.TIER_UNSTATED,
             "expected": row["expected"],
             "status": status,
             "observed": lib.md_cell(entry.get("observed", "")),
@@ -153,12 +155,13 @@ def write_md(path, matrix, spec, rows, results_dir):
                    + ", ".join(f"`{r['id']}`" for r in reg_fail)
                    + ". These gate the iteration.\n")
 
-    out.append("| Test ID | Status | Test Case Title | Priority | Regulatory | Defect |")
-    out.append("|---|---|---|---|---|---|")
+    out.append("| Test ID | Status | Test Case Title | Priority | Regulatory | Tier | Defect |")
+    out.append("|---|---|---|---|---|---|---|")
     for r in rows:
         status = f"**{r['status']}**" if r["status"] in ("Fail", "Blocked") else r["status"]
         out.append(f"| `{r['id']}` | {status} | {lib.md_cell(r['title'])} | "
-                   f"{r['priority']} | {r['regulatory']} | {r['defect'] or '—'} |")
+                   f"{r['priority']} | {r['regulatory']} | {r['tier']} | "
+                   f"{r['defect'] or '—'} |")
     out.append("")
 
     for r in rows:
@@ -168,6 +171,7 @@ def write_md(path, matrix, spec, rows, results_dir):
         out.append(f"| **Status** | {r['status']} |")
         out.append(f"| **Priority** | {r['priority']} |")
         out.append(f"| **Regulatory / Compliance-Critical** | {r['regulatory']} |")
+        out.append(f"| **Tier** | {r['tier']} |")
         if r["defect"]:
             out.append(f"| **Defect** | {r['defect']} |")
         out.append("")

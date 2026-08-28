@@ -81,6 +81,20 @@ def install_lines(name):
     return [f"/plugin marketplace add {repo}", f"/plugin install {plugin}"]
 
 
+def _repo_credential():
+    """Is there anything document F could authenticate to the repository with?
+
+    Advisory only. F is the last step and an iteration is still worth running
+    without it — but knowing now beats discovering it after the execution.
+    """
+    import os
+    if os.environ.get("GITLAB_TOKEN"):
+        return "$GITLAB_TOKEN"
+    if os.environ.get("GITLAB_COOKIE"):
+        return "$GITLAB_COOKIE"
+    return None
+
+
 def check():
     validation = find_skill("validation")
     registry = None
@@ -92,12 +106,14 @@ def check():
         "validation": str(validation) if validation else None,
         "registry": str(registry) if registry else None,
         "howto": str(howto) if howto else None,
+        "repo_credential": _repo_credential(),
         "ok": validation is not None,
     }
 
 
 def report(state):
     print("testloop preflight\n")
+
 
     if state["validation"]:
         print(f"  [ok  ] /validation — {state['validation']}")
@@ -127,6 +143,15 @@ def report(state):
         for line in install_lines("howto"):
             print(f"           {line}")
         print()
+
+    if state.get("repo_credential"):
+        print(f"  [ok  ] repository credential — {state['repo_credential']} "
+              "(document F can read the source)")
+    else:
+        print("  [warn] no $GITLAB_TOKEN or $GITLAB_COOKIE — document F cannot read the")
+        print("         source. A–E still run; pass --token or --cookie-file to")
+        print("         codevalidate.py, or skip F and say plainly that the iteration")
+        print("         was not validated against code.")
 
     print()
     if state["ok"]:

@@ -89,7 +89,15 @@ _MATRIX_COLUMNS = {
     "priority": "priority",
     "regulatory / compliance-critical": "regulatory",
     "regulatory": "regulatory",
+    "tier": "tier",
 }
+
+# A matrix written before /validation grew its Tier column has no such header.
+# The loader yields "" for it rather than failing: an old plan is still a plan,
+# and refusing to execute one over a missing column would strand every matrix
+# already in flight. The derived documents print "—" and say the plan predates
+# the column, which is honest — what they must not do is invent a tier.
+TIER_UNSTATED = "—"
 
 
 def load_matrix(path, sheet=None):
@@ -97,7 +105,8 @@ def load_matrix(path, sheet=None):
 
     Accepts the .xlsx (authoritative) or its .md twin. Row dicts carry
     id / module / role / title / preconditions / steps / expected / priority /
-    regulatory, all as strings.
+    regulatory / tier, all as strings. `tier` is "" for a matrix written before
+    the column existed.
     """
     path = Path(path).expanduser()
     if not path.exists():
@@ -146,7 +155,7 @@ def _load_matrix_xlsx(path, sheet):
             continue
         rows.append({f: get(f) for f in
                      ("id", "module", "role", "title", "preconditions",
-                      "steps", "expected", "priority", "regulatory")})
+                      "steps", "expected", "priority", "regulatory", "tier")})
     if not rows:
         raise LoopError(f"{path.name}!{ws.title} has no test-case rows")
     module = rows[0]["module"] or ws.title
@@ -173,7 +182,7 @@ def _load_matrix_md(path):
             current = {"id": heading.group(1), "module": module, "role": "",
                        "title": heading.group(2), "preconditions": "",
                        "steps": [], "expected": "", "priority": "",
-                       "regulatory": ""}
+                       "regulatory": "", "tier": ""}
             section = None
             continue
         if current is None:

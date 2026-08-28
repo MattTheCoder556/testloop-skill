@@ -41,13 +41,14 @@ HEADERS = [
     ("Test Case Title", "title"),
     ("Priority", "priority"),
     ("Regulatory / Compliance-Critical", "regulatory"),
+    ("Tier", "tier"),
     ("Executed", "executed"),
     ("Status", "status"),
     ("Evidence", "evidence"),
     ("Defect", "defect"),
     ("Gate", "gate"),
 ]
-WIDTHS = [11, 38, 9, 14, 10, 11, 28, 12, 30]
+WIDTHS = [11, 38, 9, 14, 13, 10, 11, 28, 12, 30]
 
 
 def assess(rows, unplanned, require_full_coverage):
@@ -153,12 +154,12 @@ def write_md(path, matrix, spec, rows, unplanned, unknown, criteria, blocking,
     if tally["Not run"]:
         out.append("These cases are in the plan and have no outcome. Until they are run, "
                    "the plan's claim about them is unverified:\n")
-        out.append("| Test ID | Title | Priority | Regulatory |")
-        out.append("|---|---|---|---|")
+        out.append("| Test ID | Title | Priority | Regulatory | Tier |")
+        out.append("|---|---|---|---|---|")
         for r in rows:
             if r["status"] == "Not run":
                 out.append(f"| `{r['id']}` | {lib.md_cell(r['title'])} | "
-                           f"{r['priority']} | {r['regulatory']} |")
+                           f"{r['priority']} | {r['regulatory']} | {r['tier']} |")
         out.append("")
 
     out.append("## Outcome tally\n")
@@ -181,6 +182,25 @@ def write_md(path, matrix, spec, rows, unplanned, unknown, criteria, blocking,
                    + f" | {len(group)} |")
     out.append("")
 
+    tiers = []
+    for r in rows:
+        if r["tier"] not in tiers:
+            tiers.append(r["tier"])
+    if len(tiers) > 1 or (tiers and tiers[0] != lib.TIER_UNSTATED):
+        out.append("### By tier\n")
+        out.append("Which entitlement gate the feature under test sits behind. A "
+                   "block or a not-run concentrated in one tier usually means the "
+                   "test org was on the wrong plan, not that the feature is broken.\n")
+        out.append("| Tier | " + " | ".join(lib.STATUSES) + " | Total |")
+        out.append("|---" * (len(lib.STATUSES) + 2) + "|")
+        for tier in tiers:
+            group = [r for r in rows if r["tier"] == tier]
+            counts = [sum(1 for r in group if r["status"] == s) for s in lib.STATUSES]
+            label = tier if tier != lib.TIER_UNSTATED else f"{tier} _(plan predates the column)_"
+            out.append(f"| {label} | " + " | ".join(str(c) for c in counts)
+                       + f" | {len(group)} |")
+        out.append("")
+
     out.append("### Regulatory / compliance-critical\n")
     reg = [r for r in rows if str(r["regulatory"]).strip().lower() == "yes"]
     if not reg:
@@ -196,12 +216,12 @@ def write_md(path, matrix, spec, rows, unplanned, unknown, criteria, blocking,
     if not failures:
         out.append("None.\n")
     else:
-        out.append("| Test ID | Status | Title | Priority | Regulatory | Defect | Gate |")
-        out.append("|---|---|---|---|---|---|---|")
+        out.append("| Test ID | Status | Title | Priority | Regulatory | Tier | Defect | Gate |")
+        out.append("|---|---|---|---|---|---|---|---|")
         for r in failures:
             out.append(f"| `{r['id']}` | **{r['status']}** | {lib.md_cell(r['title'])} | "
-                       f"{r['priority']} | {r['regulatory']} | {r['defect'] or '_none_'} | "
-                       f"{gate_note(r)} |")
+                       f"{r['priority']} | {r['regulatory']} | {r['tier']} | "
+                       f"{r['defect'] or '_none_'} | {gate_note(r)} |")
         out.append("")
         for r in failures:
             out.append(f"**`{r['id']}`** — expected: {lib.md_cell(r['expected'])}  ")
