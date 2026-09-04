@@ -124,13 +124,47 @@ on top of a plan nobody validated.
 
 ## 0. Establish the run
 
-Ask two things before anything else, and only these two:
+Ask three things before anything else, and only these three:
 
 1. **Which module** — then take its name and filename token from the
    `/validation` registry (`reference/modules.md` in that skill, or
    `build_test_matrix_xlsx.py --list-modules`). Not in the registry? Stop and
    ask. It is **Form Builder** and **Process Builder**, never "Editor".
 2. **Where the run directory goes.**
+3. **Which tier the run executes on:**
+
+   > **Which tier is this iteration run on?**
+   > **1** Foundation · **2** Control · **3** Vigilance · **?** not sure
+
+**Ask for the tier, never for the account.** The tier is what decides which
+matrix rows this run can reach, and it is what the record has to state so a
+`Blocked` row can be defended a month later. The login is only how you get to a
+screen, and logins are recreated far more often than tiers are renumbered — so
+the mapping lives in `reference/accounts.md`, not in the question put to the
+user.
+
+This is a different question from the one `/validation` and `/howto` answer, and
+the difference matters. There, the tier is the *entitlement gate a feature sits
+behind* — a property of the module, recorded per row. Here it is the *plan the
+test org is actually on* — a property of the environment, one per run. A matrix
+written for a Control feature is perfectly correct; executing it on a Foundation
+org is what makes those rows `Blocked`.
+
+**Never guess it.** A guessed run tier turns a provisioning mistake into a
+column of false defects. If the answer is `?`, settle it before executing:
+
+1. the tiers workbook, *Tier basis (entitlement gate)* column, for what the
+   module needs;
+2. a route actually probed on the org, which shows what that plan exposes;
+3. a capability gate visible in the product.
+
+If none of the three settles it, say so and hold the run rather than executing
+against an unknown plan — every `Blocked` and every `Fail` it produces would be
+uninterpretable.
+
+Record the answer in `results.json` as `tier`, in the product's own vocabulary
+— *Foundation*, *Control*, *Vigilance*, never "Tier 2". C, D and E all print it
+in their headers, so the plan the run reached travels with the record.
 
 Everything else follows from those. Create the run directory:
 
@@ -195,14 +229,30 @@ test means the plan and the record describe different work.
 most needs backing, because nobody goes looking for the screenshot behind a
 result they liked. `audit.py` refuses an unevidenced Pass.
 
-**Check the tier before you run the case, not after it fails.** If the row says
-`Control` or `Vigilance` and the org you are testing on cannot reach that
-feature, the case is `Blocked` — say which plan you were on and what the row
-needed. It is not a `Fail`, and it is emphatically not a defect: recording a
-gated feature as broken because the test account could not see it puts a false
-bug in front of whoever reads the record. A row marked `Tier: Unknown` is the
-same situation one step earlier — the plan never established the gate, so settle
-it and fix the row at v+1 rather than guessing which plan to test on.
+**Check the tier before you run the case, not after it fails.** Step 0 settled
+which tier this run executes on, so the check is now mechanical: compare the
+row's `Tier` against the run's, in the order Foundation < Control < Vigilance.
+
+| Row's tier vs the run's | What to record |
+|---|---|
+| at or below the run tier | execute it normally |
+| above the run tier | `Blocked` — name the row's tier and the run's |
+| `Unknown` | `Blocked`, and fix the row at v+1 |
+
+A row above the run's tier is `Blocked`, never `Fail`, and emphatically not a
+defect: recording a gated feature as broken because the org could not reach it
+puts a false bug in front of whoever reads the record. Because the run tier is
+in `results.json`, the reason survives — "Vigilance row, Foundation org" is
+checkable later, where "couldn't see it" is not.
+
+A row marked `Tier: Unknown` is the same situation one step earlier — the plan
+never established the gate, so settle it and fix the row at v+1 rather than
+guessing which plan to test on.
+
+**A whole tier's worth of Blocked rows is a provisioning answer, not a testing
+one.** If the run tier is below the module's gate, the iteration cannot say
+anything about the module; stop, get an org on the right plan, and run it there
+rather than filing a matrix full of blocks.
 
 Write outcomes into `results.json` as you go — never at the end from memory. The
 schema is in `reference/results-spec.md`; the short version:

@@ -234,6 +234,10 @@ def write_md(path, matrix, spec, rows, findings, criteria, blocking,
             out.append(f"**{label}:** `{Path(sources[key]).name}`  ")
     if spec.get("environment"):
         out.append(f"**Environment:** {spec['environment']}  ")
+    # The plan the run reached. Every Blocked row is justified against it, so the
+    # audit has to show it beside the record it is weighing.
+    if spec.get("tier"):
+        out.append(f"**Run tier:** {spec['tier']}  ")
     out.append("")
     out.append("This pass does not re-compare the plan with the record — the "
                "reconciliation already did that, and repeating it would only agree with "

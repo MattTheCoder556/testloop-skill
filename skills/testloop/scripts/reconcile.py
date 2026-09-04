@@ -122,7 +122,8 @@ def write_md(path, matrix, spec, rows, unplanned, unknown, criteria, blocking,
     out.append(f"**Module / Suite:** {matrix['module']}  ")
     out.append(f"**Matrix (plan):** `{Path(matrix['path']).name}`, sheet `{matrix['sheet']}`  ")
     out.append(f"**Results (record):** `{results_doc}`  ")
-    for label, key in (("Environment", "environment"), ("Build", "build"),
+    for label, key in (("Environment", "environment"), ("Run tier", "tier"),
+                       ("Build", "build"),
                        ("Executed by", "tester"), ("Run date", "date")):
         if spec.get(key):
             out.append(f"**{label}:** {spec[key]}  ")

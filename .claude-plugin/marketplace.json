@@ -6,12 +6,12 @@
   },
   "metadata": {
     "description": "qmsWrapper closed-loop module testing for Claude Code",
-    "version": "1.2.1"
+    "version": "1.3.0"
   },
   "plugins": [
     {
       "name": "testloop",
-      "version": "1.2.1",
+      "version": "1.3.0",
       "description": "Run one qmsWrapper module through a closed test cycle: explore it, draft the Validation Test Matrix with /validation and the user guide with /howto, execute the matrix, record the results, reconcile the record against the plan, audit the reconciliation against the record, then validate that record against the source the build came from, and either confirm the iteration or refuse it. Six documents sharing one module, timestamp and version - the sixth validates the record against the source the build came from; every count is computed rather than asserted, and an iteration that does not confirm becomes the agenda for the next one.",
       "author": {
         "name": "MattTheCoder556",

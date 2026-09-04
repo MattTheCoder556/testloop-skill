@@ -14,6 +14,7 @@ whole chain rests on this file being an account of what was seen.
   "matrix": "qmsWrapper_FormBuilder_2026-08-10_1105_v2.xlsx",
   "sheet": "Form Builder",
   "environment": "wrapper.example.com — DEV tenant, test data",
+  "tier": "Foundation",
   "build": "2026-08-10 nightly",
   "tester": "Claude Code, driven session",
   "date": "2026-08-10",
@@ -49,6 +50,7 @@ whole chain rests on this file being an account of what was seen.
 | `matrix` | yes* | Path to the Validation Test Matrix `.xlsx` or its `.md` twin, relative to this file. `--matrix` overrides it. |
 | `sheet` | only for multi-sheet workbooks | The tab this iteration covers. |
 | `environment` | yes | Where it ran. A result with no environment cannot be reproduced or challenged. |
+| `tier` | yes | The plan the org was on: `Foundation` \| `Control` \| `Vigilance`. Asked at step 0, in the product's vocabulary, never as a number. This is what every `Blocked` row is justified against — without it, "the org couldn't reach it" is an assertion nobody can check. Not to be confused with the matrix's per-row `Tier`, which is the gate a feature sits behind. |
 | `build` | recommended | Which build. Without it, a fix cannot be tied to a re-run. |
 | `tester` | recommended | Who or what executed the run. |
 | `date` | optional | Run date, if not the matrix's stamp. |

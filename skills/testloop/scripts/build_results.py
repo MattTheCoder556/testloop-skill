@@ -140,7 +140,8 @@ def write_md(path, matrix, spec, rows, results_dir):
     out.append(f"# Test Results — {matrix['module']}\n")
     out.append(f"**Module / Suite:** {matrix['module']}  ")
     out.append(f"**Matrix:** `{Path(matrix['path']).name}`, sheet `{matrix['sheet']}`  ")
-    for label, key in (("Environment", "environment"), ("Build", "build"),
+    for label, key in (("Environment", "environment"), ("Run tier", "tier"),
+                       ("Build", "build"),
                        ("Executed by", "tester"), ("Run date", "date")):
         if spec.get(key):
             out.append(f"**{label}:** {spec[key]}  ")
